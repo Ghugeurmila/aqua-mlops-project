@@ -1,19 +1,82 @@
 <!DOCTYPE html>
-<html>
-<head><title>Water Level Detection</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Level Prediction</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f7; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { color: #1a365d; text-align: center; margin-top: 0; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: #4a5568; font-weight: 600; }
+        input { width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #3182ce; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #2b6cb0; }
+        .result-box { margin-top: 20px; padding: 15px; background: #ebf8ff; border-radius: 6px; text-align: center; border: 1px solid #bee3f8; }
+        #prediction-text { font-size: 1.5rem; color: #2c5282; font-weight: bold; }
+        .status { text-align: center; font-size: 0.75rem; color: #718096; margin-top: 10px; }
+    </style>
+</head>
 <body>
-    <h2>Water Requirement Predictor</h2>
-    <input id="h" placeholder="Humidity"> <input id="t" placeholder="Temp"><br>
-    <input id="r" placeholder="Rainfall"> <input id="w" placeholder="Water Level"><br>
-    <button onclick="check()">Calculate</button>
-    <h3 id="res"></h3>
-    <script>
-        async function check() {
-            const url = `http://localhost:5000/predict?humidity=${document.getElementById('h').value}&temp=${document.getElementById('t').value}&rainfall=${document.getElementById('r').value}&water=${document.getElementById('w').value}`;
-            const resp = await fetch(url);
-            const data = await resp.json();
-            document.getElementById('res').innerText = "Required: " + data.prediction + " m";
+
+<div class="container">
+    <h2>Water Level Prediction</h2>
+    
+    <div class="input-group">
+        <label>Humidity (%)</label>
+        <input type="number" id="humidity" value="45">
+    </div>
+    <div class="input-group">
+        <label>Temperature (°C)</label>
+        <input type="number" id="temp" value="28">
+    </div>
+    <div class="input-group">
+        <label>Rainfall (mm)</label>
+        <input type="number" id="rainfall" value="12">
+    </div>
+    <div class="input-group">
+        <label>Current Water Level (m)</label>
+        <input type="number" id="water" value="5">
+    </div>
+
+    <button onclick="sendData()">Calculate Prediction</button>
+
+    <div class="result-box">
+        <div>Predicted Water Level</div>
+        <div id="prediction-text">--</div>
+    </div>
+    
+    <div class="status">Connected to Docker: localhost:5000</div>
+</div>
+
+<script>
+    async function sendData() {
+        const display = document.getElementById('prediction-text');
+        display.innerText = "Processing...";
+
+        const h = document.getElementById('humidity').value;
+        const t = document.getElementById('temp').value;
+        const r = document.getElementById('rainfall').value;
+        const w = document.getElementById('water').value;
+
+        // Matches the Flask @app.route('/predict') logic
+        const url = `http://localhost:5000/predict?humidity=${h}&temp=${t}&rainfall=${r}&water=${w}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.prediction) {
+                display.innerText = data.prediction + " m";
+            } else {
+                display.innerText = "Error";
+            }
+        } catch (err) {
+            display.innerText = "Offline";
+            console.error("Connection failed:", err);
         }
-    </script>
+    }
+</script>
 </body>
 </html>
