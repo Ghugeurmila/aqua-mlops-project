@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><title>Water Level Detection</title></head>
+<body>
+    <h2>Water Requirement Predictor</h2>
+    <input id="h" placeholder="Humidity"> <input id="t" placeholder="Temp"><br>
+    <input id="r" placeholder="Rainfall"> <input id="w" placeholder="Water Level"><br>
+    <button onclick="check()">Calculate</button>
+    <h3 id="res"></h3>
+    <script>
+        async function check() {
+            const url = `http://localhost:5000/predict?humidity=${document.getElementById('h').value}&temp=${document.getElementById('t').value}&rainfall=${document.getElementById('r').value}&water=${document.getElementById('w').value}`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            document.getElementById('res').innerText = "Required: " + data.prediction + " m";
+        }
+    </script>
+</body>
+</html>

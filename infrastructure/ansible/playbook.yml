@@ -1,0 +1,6 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Setup Docker
+      apt: { name: docker.io, state: present, update_cache: yes }

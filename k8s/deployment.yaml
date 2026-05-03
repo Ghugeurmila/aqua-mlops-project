@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: water-deploy }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: water } }
+  template:
+    metadata: { labels: { app: water } }
+    spec:
+      containers: [{ name: backend, image: water-backend, ports: [{ containerPort: 5000 }] }]
